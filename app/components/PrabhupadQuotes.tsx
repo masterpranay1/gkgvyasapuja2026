@@ -29,7 +29,7 @@ export default function PrabhupadQuotes() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-12 lg:gap-20">
           {/* Left Side: Image of Srila Prabhupada */}
-          <div className="w-full md:w-5/12 flex justify-center md:justify-end relative">
+          <div className="w-full md:w-5/12 flex justify-center relative">
             <div className="relative h-96 w-72 rounded-md overflow-hidden shadow-2xl border-4 border-white/5 group">
               <div className="absolute inset-0 bg-[#ff6b4a]/20 mix-blend-overlay group-hover:opacity-0 transition-opacity duration-700 z-10" />
               <Image
@@ -42,7 +42,7 @@ export default function PrabhupadQuotes() {
             </div>
 
             {/* Lotus Decoration */}
-            <div className="absolute -bottom-6 -right-6 text-5xl md:text-6xl text-[#ff6b4a] opacity-30 drop-shadow-lg rotating-slow animate-pulse pointer-events-none">
+            <div className="absolute -bottom-6 right-24 text-5xl md:text-6xl text-[#ff6b4a] opacity-30 drop-shadow-lg rotating-slow animate-pulse pointer-events-none">
               ❀
             </div>
           </div>

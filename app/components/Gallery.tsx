@@ -39,7 +39,7 @@ const images = [
 
 export default function Gallery() {
   return (
-    <section className="w-full py-12 bg-[#f8fafc] font-sans relative overflow-hidden">
+    <section className="w-full py-12 md:py-24 bg-[#f8fafc] font-sans relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10">
         {/* Header Section */}
         <div className="text-center space-y-4 mb-16">
