@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Facebook, Twitter, Instagram, Youtube, Menu, X } from "lucide-react";
 
 const SocialMediaLinks = [
   {
@@ -35,6 +38,8 @@ const NavLinks = [
 ];
 
 export default function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <div className="flex flex-col w-full font-sans">
       {/* Top Bar (Scrolls away) */}
@@ -86,24 +91,37 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Mobile Menu Button - Placeholder */}
-          <button className="lg:hidden text-white p-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
+          {/* Mobile Menu Button */}
+          <button
+            className="lg:hidden text-white p-2 hover:bg-white/10 rounded-md transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden bg-[#0a2540] border-t border-white/10">
+            <nav className="flex flex-col px-4 pt-2 pb-6 gap-2">
+              {NavLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="block px-4 py-3 text-base font-medium text-gray-200 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        )}
       </header>
     </div>
   );
