@@ -1,14 +1,20 @@
 "use client";
 
 import { ChevronUp } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   };
+
+  if (pathname.startsWith("/admin-dashboard")) {
+    return null;
+  }
 
   return (
     <footer className="w-full bg-[#0a2540] text-gray-200 py-6 relative font-sans">

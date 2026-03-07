@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Facebook, Twitter, Instagram, Youtube, Menu, X } from "lucide-react";
 
 const SocialMediaLinks = [
@@ -40,6 +41,7 @@ const NavLinks = [
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
 
   // Add scroll event listener to track when the page is scrolled
   useEffect(() => {
@@ -49,6 +51,10 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (pathname.startsWith("/admin-dashboard")) {
+    return null;
+  }
 
   return (
     <>
