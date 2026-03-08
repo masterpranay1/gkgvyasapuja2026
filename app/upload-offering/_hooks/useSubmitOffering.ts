@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { submitOffering } from "@/app/actions/offering";
+import { fixGrammar } from "@/app/actions/ai";
 import { OfferingFormData } from "../_components/types";
 
 export function useSubmitOffering(
@@ -10,6 +11,8 @@ export function useSubmitOffering(
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [isFixingText, setIsFixingText] = useState(false);
 
   const validateForm = () => {
     if (
@@ -70,5 +73,40 @@ export function useSubmitOffering(
     }
   };
 
-  return { isSubmitting, success, submitFinal };
+  const handleAutoCorrection = async (
+    setExtractedText: (text: string) => void,
+  ) => {
+    if (!validateForm()) return;
+
+    if (!isReviewing) {
+      setIsFixingText(true);
+      setError(null);
+      try {
+        const result = await fixGrammar(extractedText);
+        if (result.success && result.text) {
+          setExtractedText(result.text);
+        }
+      } catch (err) {
+        console.error("Grammar fix failed", err);
+      } finally {
+        setIsFixingText(false);
+        setIsReviewing(true);
+        // Ensure user can see the updated text
+        window.scrollBy({ top: 300, behavior: "smooth" });
+      }
+    } else {
+      await submitFinal();
+    }
+  };
+
+  return {
+    isSubmitting,
+    success,
+    submitFinal,
+    validateForm,
+    handleAutoCorrection,
+    isReviewing,
+    isFixingText,
+    setIsReviewing,
+  };
 }

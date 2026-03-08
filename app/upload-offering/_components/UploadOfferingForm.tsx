@@ -29,12 +29,14 @@ export default function UploadOfferingForm() {
   const { file, extractedText, setExtractedText, isParsing, handleFileChange } =
     useDocumentHandling(setError);
 
-  const { isSubmitting, success, submitFinal } = useSubmitOffering(
-    formData,
-    file,
-    extractedText,
-    setError,
-  );
+  const {
+    isSubmitting,
+    success,
+    handleAutoCorrection,
+    isReviewing,
+    isFixingText,
+    setIsReviewing,
+  } = useSubmitOffering(formData, file, extractedText, setError);
 
   if (success) {
     return <SuccessState onReturnHome={() => router.push("/")} />;
@@ -73,29 +75,61 @@ export default function UploadOfferingForm() {
           />
           <DocumentSection
             file={file}
-            handleFileChange={handleFileChange}
+            handleFileChange={(e) => {
+              handleFileChange(e);
+              setIsReviewing(false);
+            }}
             isParsing={isParsing}
             extractedText={extractedText}
-            setExtractedText={setExtractedText}
+            setExtractedText={(text) => {
+              setExtractedText(text);
+              setIsReviewing(false);
+            }}
             formData={formData}
             handleSelectChange={handleSelectChange}
           />
+          {isReviewing && (
+            <div className="p-5 bg-blue-500/10 border border-blue-400/30 rounded-2xl text-blue-100 flex items-start gap-3 animate-in fade-in slide-in-from-bottom-2">
+              <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 mt-0.5 text-blue-300">
+                i
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="font-semibold text-blue-200">
+                  Review your offering
+                </p>
+                <p className="text-md text-blue-100/80">
+                  We have quickly checked your document's text to ensure proper
+                  spelling and formatting. Please review the text above to make
+                  sure it is correct. If you agree, click "Confirm & Submit"
+                  below.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Form Action Footer */}
-      <div className="bg-black/20 backdrop-blur-sm p-8 md:px-14 border-t border-white/10 flex justify-end sticky bottom-0 z-10">
+      <div className="bg-black/20 backdrop-blur-sm p-8 md:px-14 border-t border-white/10 flex justify-end sticky bottom-0 z-10 transition-all">
         <Button
-          onClick={submitFinal}
-          disabled={isSubmitting || isParsing || !file || !extractedText}
+          onClick={() => handleAutoCorrection(setExtractedText)}
+          disabled={
+            isSubmitting || isParsing || isFixingText || !file || !extractedText
+          }
           size="lg"
-          className="bg-white text-[#0a2540] hover:bg-gray-100 px-10 py-7 text-xl rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed font-medium w-full sm:w-auto shadow-xl shadow-black/20 transition-all hover:-translate-y-0.5"
+          className={`px-10 py-7 text-xl rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed font-medium w-full sm:w-auto shadow-xl shadow-black/20 transition-all hover:-translate-y-0.5 ${
+            isReviewing
+              ? "bg-blue-500 text-white hover:bg-blue-600"
+              : "bg-white text-[#0a2540] hover:bg-gray-100"
+          }`}
         >
-          {isSubmitting ? (
+          {isSubmitting || isFixingText ? (
             <>
-              <Loader2 className="w-6 h-6 mr-3 animate-spin" /> Submitting
-              Offering...
+              <Loader2 className="w-6 h-6 mr-3 animate-spin" />{" "}
+              {isFixingText ? "Reviewing text..." : "Submitting Offering..."}
             </>
+          ) : isReviewing ? (
+            "Confirm & Submit"
           ) : (
             "Submit Offering"
           )}

@@ -127,9 +127,11 @@ export function DocumentSection({
                     दस्तावेज़ पूर्वावलोकन
                   </span>
                 </label>
-                <span className="text-sm text-gray-400">
-                  You may edit this text before submitting
-                </span>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="text-sm text-gray-400">
+                    You may edit this text before submitting
+                  </span>
+                </div>
               </div>
               <div className="w-full h-[400px] bg-white border border-gray-200 rounded-2xl p-1 focus-within:ring-2 focus-within:ring-[#0a2540]/20 focus-within:border-[#0a2540]/30 transition-shadow shadow-sm overflow-hidden">
                 <div
