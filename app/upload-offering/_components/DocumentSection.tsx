@@ -28,6 +28,17 @@ export function DocumentSection({
   formData,
   handleSelectChange,
 }: Props) {
+  const contentEditableRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (
+      contentEditableRef.current &&
+      contentEditableRef.current.innerHTML !== extractedText
+    ) {
+      contentEditableRef.current.innerHTML = extractedText || "";
+    }
+  }, [extractedText]);
+
   return (
     <section className="pt-4">
       <h3 className="text-2xl font-semibold text-white mb-8 border-b border-white/10 pb-4">
@@ -120,12 +131,14 @@ export function DocumentSection({
                   You may edit this text before submitting
                 </span>
               </div>
-              <div className="w-full h-[400px] bg-white border border-gray-200 rounded-2xl p-1 focus-within:ring-2 focus-within:ring-[#0a2540]/20 focus-within:border-[#0a2540]/30 transition-shadow shadow-sm">
-                <textarea
-                  className="w-full h-full p-6 bg-transparent text-gray-800 border-none outline-none resize-none rounded-xl leading-relaxed text-xl"
-                  value={extractedText}
-                  onChange={(e) => setExtractedText(e.target.value)}
-                  placeholder="Your offering text will appear here..."
+              <div className="w-full h-[400px] bg-white border border-gray-200 rounded-2xl p-1 focus-within:ring-2 focus-within:ring-[#0a2540]/20 focus-within:border-[#0a2540]/30 transition-shadow shadow-sm overflow-hidden">
+                <div
+                  ref={contentEditableRef}
+                  className="w-full h-full p-6 bg-transparent text-gray-800 border-none outline-none resize-none rounded-xl leading-relaxed text-xl overflow-y-auto [&>p]:mb-0 [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mb-4 [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mb-3 [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mb-3 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-4 [&>ol]:list-decimal [&>ol]:pl-5 [&>ol]:mb-4"
+                  contentEditable
+                  suppressContentEditableWarning
+                  onInput={(e) => setExtractedText(e.currentTarget.innerHTML)}
+                  onBlur={(e) => setExtractedText(e.currentTarget.innerHTML)}
                 />
               </div>
             </div>

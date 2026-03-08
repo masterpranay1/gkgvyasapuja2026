@@ -113,7 +113,11 @@ export async function parseDocx(formData: FormData) {
     }
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const result = await mammoth.extractRawText({ buffer });
+    const result = await mammoth.convertToHtml(
+      { buffer },
+      { ignoreEmptyParagraphs: false },
+    );
+    console.log(result);
     return { success: true, text: result.value };
   } catch (error) {
     console.error("Failed to parse docx:", error);
