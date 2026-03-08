@@ -55,6 +55,7 @@ export const users = pgTable("user", {
   countryId: uuid("country_id").notNull(),
   stateId: uuid("state_id").notNull(),
   cityId: uuid("city_id").notNull(),
+  templeId: uuid("temple_id").notNull(),
 
   initiated: boolean("initiated").default(false).notNull(),
 
@@ -91,6 +92,10 @@ export const offerings = pgTable("offering", {
   year: varchar("year", { length: 255 }).notNull(),
 
   offering: varchar("offering", { length: 10000 }).notNull(),
+
+  language: varchar("language", { length: 255 })
+    .$type<"Hindi" | "English">()
+    .notNull(),
 
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
