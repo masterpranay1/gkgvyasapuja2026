@@ -9,6 +9,12 @@ import {
 } from "@/components/ui/select";
 import { OfferingFormData } from "./types";
 import { useAiChanges } from "../_hooks/useAiChanges";
+import dynamic from "next/dynamic";
+
+const QuillEditor = dynamic(() => import("./QuillWrapper"), {
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full bg-gray-100 animate-pulse rounded-xl" />
+});
 
 interface Props {
   file: File | null;
@@ -29,17 +35,7 @@ export function DocumentSection({
   formData,
   handleSelectChange,
 }: Props) {
-  const contentEditableRef = React.useRef<HTMLDivElement>(null);
   const changes = useAiChanges(extractedText);
-
-  React.useEffect(() => {
-    if (
-      contentEditableRef.current &&
-      contentEditableRef.current.innerHTML !== extractedText
-    ) {
-      contentEditableRef.current.innerHTML = extractedText || "";
-    }
-  }, [extractedText]);
 
   const handleReject = (id: string, originalText: string) => {
     if (typeof window === "undefined") return;
@@ -118,8 +114,8 @@ export function DocumentSection({
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <Select
                   value={formData.language}
-                  onValueChange={(val) =>
-                    handleSelectChange("language", val as string)
+                  onValueChange={(val: string | null) =>
+                    handleSelectChange("language", val || "")
                   }
                 >
                   <SelectTrigger className="h-10 px-4 bg-white/10 border-white/20 text-white focus:ring-white/20 rounded-lg shrink-0 w-[140px] font-medium">
@@ -147,14 +143,10 @@ export function DocumentSection({
                   </span>
                 </div>
               </div>
-              <div className="w-full h-[400px] bg-white border border-gray-200 rounded-2xl p-1 focus-within:ring-2 focus-within:ring-[#0a2540]/20 focus-within:border-[#0a2540]/30 transition-shadow shadow-sm overflow-hidden">
-                <div
-                  ref={contentEditableRef}
-                  className="w-full h-full p-6 bg-transparent text-gray-800 border-none outline-none resize-none rounded-xl leading-relaxed text-xl overflow-y-auto [&>p]:mb-0 [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mb-4 [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mb-3 [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mb-3 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-4 [&>ol]:list-decimal [&>ol]:pl-5 [&>ol]:mb-4 [&_.ai-correction]:bg-yellow-100 [&_.ai-correction]:border-b-2 [&_.ai-correction]:border-yellow-500 [&_.ai-correction]:transition-colors"
-                  contentEditable
-                  suppressContentEditableWarning
-                  onInput={(e) => setExtractedText(e.currentTarget.innerHTML)}
-                  onBlur={(e) => setExtractedText(e.currentTarget.innerHTML)}
+              <div className="w-full min-h-[400px] bg-white border border-gray-200 rounded-2xl p-1 focus-within:ring-2 focus-within:ring-[#0a2540]/20 focus-within:border-[#0a2540]/30 transition-shadow shadow-sm overflow-hidden text-black [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-none [&_.ql-toolbar]:bg-gray-50 [&_.ql-container]:border-none [&_.ql-container]:rounded-b-xl [&_.ql-editor]:min-h-[350px] [&_.ql-editor]:text-lg [&_.ai-correction]:bg-yellow-100 [&_.ai-correction]:border-b-2 [&_.ai-correction]:border-yellow-500 [&_.ai-correction]:transition-colors">
+                <QuillEditor
+                  value={extractedText}
+                  onChange={setExtractedText}
                 />
               </div>
 
