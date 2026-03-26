@@ -1,5 +1,5 @@
 import React from "react";
-import { UploadCloud, Loader2, FileText } from "lucide-react";
+import { UploadCloud, Loader2, FileText, X } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -8,6 +8,15 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { OfferingFormData } from "./types";
+import { useAiChanges } from "../_hooks/useAiChanges";
+import dynamic from "next/dynamic";
+
+const QuillEditor = dynamic(() => import("./QuillWrapper"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[400px] w-full bg-gray-100 animate-pulse rounded-xl" />
+  ),
+});
 
 interface Props {
   file: File | null;
@@ -28,16 +37,19 @@ export function DocumentSection({
   formData,
   handleSelectChange,
 }: Props) {
-  const contentEditableRef = React.useRef<HTMLDivElement>(null);
+  const changes = useAiChanges(extractedText);
 
-  React.useEffect(() => {
-    if (
-      contentEditableRef.current &&
-      contentEditableRef.current.innerHTML !== extractedText
-    ) {
-      contentEditableRef.current.innerHTML = extractedText || "";
+  const handleReject = (id: string, originalText: string) => {
+    if (typeof window === "undefined") return;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(extractedText, "text/html");
+    const node = doc.querySelector(`.ai-correction[data-id="${id}"]`);
+    if (node) {
+      const textNode = doc.createTextNode(originalText);
+      node.parentNode?.replaceChild(textNode, node);
+      setExtractedText(doc.body.innerHTML);
     }
-  }, [extractedText]);
+  };
 
   return (
     <section className="pt-4">
@@ -104,8 +116,8 @@ export function DocumentSection({
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <Select
                   value={formData.language}
-                  onValueChange={(val) =>
-                    handleSelectChange("language", val as string)
+                  onValueChange={(val: string | null) =>
+                    handleSelectChange("language", val || "")
                   }
                 >
                   <SelectTrigger className="h-10 px-4 bg-white/10 border-white/20 text-white focus:ring-white/20 rounded-lg shrink-0 w-35 font-medium">
@@ -143,6 +155,47 @@ export function DocumentSection({
                   onBlur={(e) => setExtractedText(e.currentTarget.innerHTML)}
                 />
               </div>
+
+              {changes.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-white/10">
+                  <h4 className="text-lg text-white font-semibold mb-4 flex items-center gap-2">
+                    Pending Changes{" "}
+                    <span className="bg-yellow-500 text-[#0a2540] text-xs px-2.5 py-0.5 rounded-full font-bold">
+                      {changes.length}
+                    </span>
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {changes.map((change) => (
+                      <div
+                        key={change.id}
+                        className="bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col gap-3 animate-in fade-in zoom-in-95 hover:bg-white/10 transition-colors"
+                      >
+                        <div className="flex-1 space-y-1">
+                          <p className="text-sm text-gray-400 line-through decoration-red-500/50">
+                            {change.original}
+                          </p>
+                          <p className="text-lg text-white font-medium">
+                            {change.updated}
+                          </p>
+                          <p className="text-xs text-blue-300 mt-2 font-medium">
+                            {change.reason}
+                          </p>
+                        </div>
+                        <div className="flex justify-end mt-2">
+                          <button
+                            onClick={() =>
+                              handleReject(change.id, change.original)
+                            }
+                            className="text-xs flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-4 py-2 rounded-xl transition-colors border border-red-500/20 font-semibold"
+                          >
+                            <X className="w-4 h-4" /> Reject Change
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
