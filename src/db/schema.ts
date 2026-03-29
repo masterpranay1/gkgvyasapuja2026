@@ -86,6 +86,15 @@ export const books = pgTable("book", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const maintainers = pgTable("maintainer", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  loginId: varchar("login_id", { length: 64 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  label: varchar("label", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const offerings = pgTable("offering", {
   id: uuid("id").primaryKey().defaultRandom(),
 
@@ -98,15 +107,31 @@ export const offerings = pgTable("offering", {
     .$type<"Hindi" | "English">()
     .notNull(),
 
+  /** Set when staff (admin/maintainer) edits; null means never staff-edited. */
+  lastEditedAt: timestamp("last_edited_at"),
+  lastEditedByRole: varchar("last_edited_by_role", { length: 32 }).$type<
+    "admin" | "maintainer" | null
+  >(),
+  lastEditedByMaintainerId: uuid("last_edited_by_maintainer_id").references(
+    () => maintainers.id,
+    { onDelete: "set null" },
+  ),
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const maintainers = pgTable("maintainer", {
+/** Append-only log of staff edits to offerings. */
+export const offeringEditLogs = pgTable("offering_edit_log", {
   id: uuid("id").primaryKey().defaultRandom(),
-  loginId: varchar("login_id", { length: 64 }).notNull().unique(),
-  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  label: varchar("label", { length: 255 }),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  offeringId: uuid("offering_id")
+    .notNull()
+    .references(() => offerings.id, { onDelete: "cascade" }),
+  editedAt: timestamp("edited_at").defaultNow().notNull(),
+  editorRole: varchar("editor_role", { length: 32 })
+    .notNull()
+    .$type<"admin" | "maintainer">(),
+  maintainerId: uuid("maintainer_id").references(() => maintainers.id, {
+    onDelete: "set null",
+  }),
 });

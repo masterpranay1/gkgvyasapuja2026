@@ -1,6 +1,9 @@
 "use server";
 
-import { assertCanManageOfferings } from "@/lib/auth";
+import {
+  assertCanManageOfferings,
+  getOfferingEditorContext,
+} from "@/lib/auth";
 import { db } from "@/db";
 import {
   countries,
@@ -10,9 +13,14 @@ import {
   books,
   offerings,
   users,
+  maintainers,
+  offeringEditLogs,
 } from "@/db/schema";
 import { eq, desc, and, asc, count, ilike, or, gte, lte } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { revalidatePath } from "next/cache";
+
+const lastEditorMaintainer = alias(maintainers, "last_editor_maintainer");
 
 // --- Country Actions ---
 
@@ -626,6 +634,11 @@ export async function getAdminOfferings(filters?: {
       stateName: states.name,
       cityName: cities.name,
       templeName: temples.name,
+      lastEditedAt: offerings.lastEditedAt,
+      lastEditedByRole: offerings.lastEditedByRole,
+      lastEditedByMaintainerId: offerings.lastEditedByMaintainerId,
+      lastEditorLabel: lastEditorMaintainer.label,
+      lastEditorLoginId: lastEditorMaintainer.loginId,
     })
     .from(offerings)
     .innerJoin(users, eq(offerings.userId, users.id))
@@ -633,6 +646,10 @@ export async function getAdminOfferings(filters?: {
     .leftJoin(states, eq(users.stateId, states.id))
     .leftJoin(cities, eq(users.cityId, cities.id))
     .leftJoin(temples, eq(users.templeId, temples.id))
+    .leftJoin(
+      lastEditorMaintainer,
+      eq(offerings.lastEditedByMaintainerId, lastEditorMaintainer.id),
+    )
     .where(whereClause)
     .orderBy(desc(offerings.createdAt))
     .limit(pageSize)
@@ -692,6 +709,11 @@ export async function getAdminOfferingsForExport(filters?: {
       stateName: states.name,
       cityName: cities.name,
       templeName: temples.name,
+      lastEditedAt: offerings.lastEditedAt,
+      lastEditedByRole: offerings.lastEditedByRole,
+      lastEditedByMaintainerId: offerings.lastEditedByMaintainerId,
+      lastEditorLabel: lastEditorMaintainer.label,
+      lastEditorLoginId: lastEditorMaintainer.loginId,
     })
     .from(offerings)
     .innerJoin(users, eq(offerings.userId, users.id))
@@ -699,6 +721,10 @@ export async function getAdminOfferingsForExport(filters?: {
     .leftJoin(states, eq(users.stateId, states.id))
     .leftJoin(cities, eq(users.cityId, cities.id))
     .leftJoin(temples, eq(users.templeId, temples.id))
+    .leftJoin(
+      lastEditorMaintainer,
+      eq(offerings.lastEditedByMaintainerId, lastEditorMaintainer.id),
+    )
     .where(whereClause)
     .orderBy(desc(offerings.createdAt))
     .limit(MAX_EXPORT_ROWS);
@@ -715,14 +741,31 @@ export async function editOffering(
   await assertCanManageOfferings();
 
   try {
-    await db
-      .update(offerings)
-      .set({
-        offering: data.offering,
-        language: data.language,
-        updatedAt: new Date(),
-      })
-      .where(eq(offerings.id, id));
+    const ctx = await getOfferingEditorContext();
+    const now = new Date();
+    const role = ctx.role === "admin" ? "admin" : "maintainer";
+    const maintainerId =
+      ctx.role === "maintainer" ? ctx.maintainerId : null;
+
+    await db.transaction(async (tx) => {
+      await tx.insert(offeringEditLogs).values({
+        offeringId: id,
+        editedAt: now,
+        editorRole: role,
+        maintainerId,
+      });
+      await tx
+        .update(offerings)
+        .set({
+          offering: data.offering,
+          language: data.language,
+          updatedAt: now,
+          lastEditedAt: now,
+          lastEditedByRole: role,
+          lastEditedByMaintainerId: maintainerId,
+        })
+        .where(eq(offerings.id, id));
+    });
 
     revalidatePath("/admin-dashboard/offerings");
     revalidatePath("/maintainer-dashboard/offerings");

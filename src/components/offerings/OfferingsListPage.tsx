@@ -4,7 +4,13 @@ import { OfferingsFilter } from "@/app/(admin)/admin-dashboard/offerings/_compon
 import type { OfferingsFilterInitialSelections } from "@/app/(admin)/admin-dashboard/offerings/_components/OfferingsFilter";
 import { ViewEditOfferingModal } from "@/app/(admin)/admin-dashboard/offerings/_components/ViewEditOfferingModal";
 import { OfferingsExportButtons } from "@/components/offerings/OfferingsExportButtons";
+import { OfferingsPageViewModal } from "@/components/offerings/OfferingsPageViewModal";
 import { OfferingsPagination } from "@/components/offerings/OfferingsPagination";
+import {
+  hasStaffEdit,
+  staffEditorLabel,
+} from "@/lib/offering-staff-edit";
+import { cn } from "@/lib/utils";
 import {
   Table,
   TableBody,
@@ -48,9 +54,12 @@ export function OfferingsListPage({
             </p>
           )}
         </div>
-        <Suspense fallback={null}>
-          <OfferingsExportButtons />
-        </Suspense>
+        <div className="flex flex-wrap items-center gap-2">
+          <Suspense fallback={null}>
+            <OfferingsExportButtons />
+          </Suspense>
+          <OfferingsPageViewModal offerings={offerings} />
+        </div>
       </div>
 
       <Suspense
@@ -78,13 +87,24 @@ export function OfferingsListPage({
                 <TableHead>City</TableHead>
                 <TableHead>Temple</TableHead>
                 <TableHead>Language</TableHead>
+                <TableHead className="whitespace-nowrap">Staff edited</TableHead>
                 <TableHead className="min-w-[200px]">Offering</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {offerings.map((item) => (
-                <TableRow key={item.id}>
+              {offerings.map((item) => {
+                const edited = hasStaffEdit(item);
+                const editor = staffEditorLabel(item);
+                return (
+                <TableRow
+                  key={item.id}
+                  className={cn(
+                    edited
+                      ? "bg-emerald-50/90 hover:bg-emerald-50 data-[state=selected]:bg-emerald-50"
+                      : "bg-red-50/80 hover:bg-red-50/90 data-[state=selected]:bg-red-50/80",
+                  )}
+                >
                   <TableCell className="font-medium text-gray-900 whitespace-nowrap">
                     {item.user.firstName} {item.user.lastName}
                   </TableCell>
@@ -110,6 +130,23 @@ export function OfferingsListPage({
                   <TableCell className="whitespace-nowrap">
                     {item.language}
                   </TableCell>
+                  <TableCell className="text-sm align-top">
+                    <div className="flex flex-col gap-0.5">
+                      <span
+                        className={cn(
+                          "font-medium",
+                          edited ? "text-emerald-800" : "text-red-800",
+                        )}
+                      >
+                        {edited ? "Yes" : "No"}
+                      </span>
+                      {editor ? (
+                        <span className="text-xs text-gray-600 max-w-[140px]">
+                          {editor}
+                        </span>
+                      ) : null}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <ViewEditOfferingModal
                       offering={{
@@ -126,11 +163,12 @@ export function OfferingsListPage({
                       : "-"}
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
               {offerings.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={11}
+                    colSpan={12}
                     className="h-24 text-center text-gray-500"
                   >
                     No offerings found for the selected filters.

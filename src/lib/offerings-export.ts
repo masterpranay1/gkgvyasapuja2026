@@ -1,5 +1,10 @@
 import type { AdminOfferingExportRow } from "@/app/(admin)/actions/admin";
 import {
+  hasStaffEdit,
+  staffEditorLabel,
+  formatStaffEditedAt,
+} from "@/lib/offering-staff-edit";
+import {
   Document,
   HeadingLevel,
   Packer,
@@ -33,6 +38,9 @@ export function buildOfferingsXlsxBuffer(rows: AdminOfferingExportRow[]) {
     City: r.cityName ?? "",
     Temple: r.templeName ?? "",
     Language: r.language,
+    "Staff edited": hasStaffEdit(r) ? "Yes" : "No",
+    "Last edited by": staffEditorLabel(r) ?? "",
+    "Last edited at": formatStaffEditedAt(r.lastEditedAt),
     Offering: stripHtmlForExport(r.offering),
     Date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "",
   }));
@@ -72,6 +80,13 @@ export async function buildOfferingsDocxBuffer(rows: AdminOfferingExportRow[]) {
     children.push(
       new Paragraph({
         text: location ? `Location: ${location}` : "Location: —",
+      }),
+    );
+    children.push(
+      new Paragraph({
+        text: hasStaffEdit(r)
+          ? `Staff edited: Yes — ${staffEditorLabel(r)} (${formatStaffEditedAt(r.lastEditedAt)})`
+          : "Staff edited: No",
       }),
     );
 

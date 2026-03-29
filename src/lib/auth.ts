@@ -9,6 +9,31 @@ export async function getAdminSession(): Promise<boolean> {
   return c.get("admin_session")?.value === "true";
 }
 
+export type OfferingEditorContext =
+  | { role: "admin" }
+  | { role: "maintainer"; maintainerId: string };
+
+/** Who is performing a staff edit (admin session or maintainer cookie). Call after `assertCanManageOfferings`. */
+export async function getOfferingEditorContext(): Promise<OfferingEditorContext> {
+  if (await getAdminSession()) {
+    return { role: "admin" };
+  }
+  const c = await cookies();
+  const mid = c.get("maintainer_session")?.value;
+  if (!mid) {
+    throw new Error("Not authorized");
+  }
+  const row = await db
+    .select({ id: maintainers.id })
+    .from(maintainers)
+    .where(eq(maintainers.id, mid))
+    .limit(1);
+  if (!row[0]) {
+    throw new Error("Not authorized");
+  }
+  return { role: "maintainer", maintainerId: mid };
+}
+
 export async function requireAdminSession(): Promise<void> {
   if (!(await getAdminSession())) {
     redirect("/admin");
