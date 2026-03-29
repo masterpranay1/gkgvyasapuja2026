@@ -37,6 +37,7 @@ export const temples = pgTable("temple", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
   cityId: uuid("city_id").notNull(),
+  stateId: uuid("state_id").notNull(),
 });
 
 export const users = pgTable("user", {

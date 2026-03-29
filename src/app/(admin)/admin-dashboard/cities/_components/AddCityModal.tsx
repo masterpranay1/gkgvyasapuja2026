@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,13 +11,33 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { addCity } from "@/app/actions/admin";
+import { addCity, searchCountries, searchStates } from "@/app/(admin)/actions/admin";
 import { Plus } from "lucide-react";
+import {
+  AsyncSearchCombobox,
+  type ComboboxItem,
+} from "./AsyncSearchCombobox";
 
-export function AddCityModal({ states }: { states: any[] }) {
+export function AddCityModal() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [country, setCountry] = useState<ComboboxItem | null>(null);
+  const [state, setState] = useState<ComboboxItem | null>(null);
+
+  function handleCountryChange(next: ComboboxItem | null) {
+    setCountry(next);
+    setState(null);
+  }
+
+  const searchCountriesCb = useCallback(
+    (q: string) => searchCountries(q),
+    [],
+  );
+  const searchStatesCb = useCallback(
+    (q: string) => searchStates(q, { countryId: country?.id }),
+    [country?.id],
+  );
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,20 +45,24 @@ export function AddCityModal({ states }: { states: any[] }) {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get("name") as string,
-      stateId: formData.get("stateId") as string,
-    };
+    const name = (formData.get("name") as string)?.trim();
 
-    if (!data.stateId) {
-      setError("Please select a valid state.");
+    if (!name) {
+      setError("Name is required.");
+      setLoading(false);
+      return;
+    }
+    if (!state?.id) {
+      setError("Please search and select a state.");
       setLoading(false);
       return;
     }
 
-    const result = await addCity(data as any);
+    const result = await addCity({ name, stateId: state.id });
     if (result.success) {
       setOpen(false);
+      setCountry(null);
+      setState(null);
     } else {
       setError(result.error || "Failed to add city");
     }
@@ -68,23 +92,30 @@ export function AddCityModal({ states }: { states: any[] }) {
             <Input id="name" name="name" required className="col-span-3" />
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="stateId" className="text-right">
-              State *
-            </Label>
-            <select
-              id="stateId"
-              name="stateId"
-              required
-              className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">Select a state...</option>
-              {states.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-4 col-span-full">
+            <p className="text-xs text-muted-foreground">
+              Optional: pick a country first to narrow state search.
+            </p>
+            <AsyncSearchCombobox
+              id="add-city-country"
+              label="Country (optional)"
+              placeholder="Search country…"
+              search={searchCountriesCb}
+              value={country}
+              onChange={handleCountryChange}
+            />
+            <AsyncSearchCombobox
+              id="add-city-state"
+              label="State *"
+              placeholder={
+                country
+                  ? "Search state in selected country…"
+                  : "Search state…"
+              }
+              search={searchStatesCb}
+              value={state}
+              onChange={setState}
+            />
           </div>
 
           <div className="mt-4 flex justify-end">

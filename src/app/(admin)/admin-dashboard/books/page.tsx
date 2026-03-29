@@ -1,4 +1,4 @@
-import { getBooks } from "@/app/actions/admin";
+import { getBooks } from "@/app/(admin)/actions/admin";
 import { AddBookModal } from "./_components/AddBookModal";
 import {
   Table,

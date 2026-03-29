@@ -5,7 +5,7 @@ import {
   getStates,
   getCities,
   getTemples,
-} from "@/app/actions/admin";
+} from "@/app/(admin)/actions/admin";
 import { OfferingsFilter } from "./_components/OfferingsFilter";
 import { ViewEditOfferingModal } from "./_components/ViewEditOfferingModal";
 import {

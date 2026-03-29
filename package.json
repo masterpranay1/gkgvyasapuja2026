@@ -8,7 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "db:seed:countries": "tsx src/scripts/seed-countries.ts",
+    "db:seed:states": "tsx src/scripts/seed-states.ts",
+    "db:seed:cities": "tsx src/scripts/seed-cities.ts",
+    "db:seed:temples": "tsx src/scripts/seed-temples.ts",
+    "db:seed:books": "tsx src/scripts/seed-books.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",

@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { addState } from "@/app/actions/admin";
 import { Plus } from "lucide-react";
+import { addState } from "@/app/(admin)/actions/admin";
 
 export function AddStateModal({ countries }: { countries: any[] }) {
   const [open, setOpen] = useState(false);

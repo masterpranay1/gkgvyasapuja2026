@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { addCountry } from "@/app/actions/admin";
+import { addCountry } from "@/app/(admin)/actions/admin";
 import { Plus } from "lucide-react";
 
 export function AddCountryModal() {

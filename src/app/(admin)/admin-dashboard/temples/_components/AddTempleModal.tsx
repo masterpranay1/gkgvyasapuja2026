@@ -11,10 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { addTemple } from "@/app/actions/admin";
+import { addTemple } from "@/app/(admin)/actions/admin";
+import { cities } from "@/db/schema";
 import { Plus } from "lucide-react";
 
-export function AddTempleModal({ cities }: { cities: any[] }) {
+type CityRow = typeof cities.$inferSelect;
+
+export function AddTempleModal({ cities }: { cities: CityRow[] }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,18 +28,26 @@ export function AddTempleModal({ cities }: { cities: any[] }) {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get("name") as string,
-      cityId: formData.get("cityId") as string,
-    };
+    const name = (formData.get("name") as string)?.trim();
+    const cityId = formData.get("cityId") as string;
+    const city = cities.find((c) => c.id === cityId);
 
-    if (!data.cityId) {
+    if (!name) {
+      setError("Name is required.");
+      setLoading(false);
+      return;
+    }
+    if (!cityId || !city) {
       setError("Please select a valid city.");
       setLoading(false);
       return;
     }
 
-    const result = await addTemple(data as any);
+    const result = await addTemple({
+      name,
+      cityId: city.id,
+      stateId: city.stateId,
+    });
     if (result.success) {
       setOpen(false);
     } else {
