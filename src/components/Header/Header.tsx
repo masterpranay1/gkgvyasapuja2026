@@ -52,7 +52,10 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (pathname.startsWith("/admin-dashboard")) {
+  if (
+    pathname.startsWith("/admin-dashboard") ||
+    pathname.startsWith("/maintainer-dashboard")
+  ) {
     return null;
   }
 
