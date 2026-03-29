@@ -1,4 +1,5 @@
 import React from "react";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,12 +17,21 @@ interface Props {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
   handleSelectChange: (name: string, value: string) => void;
+  /** When set, used for the email field so parent can reset modal state on edit. */
+  onEmailChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
+  onEmailBlur?: () => void;
+  isCheckingEmail?: boolean;
 }
 
 export function PersonalInfoSection({
   formData,
   handleInputChange,
   handleSelectChange,
+  onEmailChange,
+  onEmailBlur,
+  isCheckingEmail,
 }: Props) {
   return (
     <section>
@@ -48,14 +58,24 @@ export function PersonalInfoSection({
           />
         </FormField>
         <FormField label="Email" subLabel="ईमेल" required>
-          <Input
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            placeholder="john@example.com"
-            className="h-12 px-5 bg-gray-50 border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-xl transition-colors"
-          />
+          <div className="relative">
+            <Input
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={onEmailChange ?? handleInputChange}
+              onBlur={onEmailBlur}
+              placeholder="john@example.com"
+              disabled={isCheckingEmail}
+              className="h-12 px-5 bg-gray-50 border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-xl transition-colors pr-12"
+            />
+            {isCheckingEmail && (
+              <Loader2
+                className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-[#0a2540]/60"
+                aria-hidden
+              />
+            )}
+          </div>
         </FormField>
         <FormField label="Phone" subLabel="फ़ोन नंबर" required>
           <Input

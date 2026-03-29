@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
+import {
+  checkUserByEmail,
+  type ExistingUserProfile,
+} from "@/app/(admin)/actions/offering";
 import { useOfferingForm } from "../_hooks/useOfferingForm";
 import { useLocationData } from "../_hooks/useLocationData";
 import { useDocumentHandling } from "../_hooks/useDocumentHandling";
@@ -15,11 +19,60 @@ import { InitiationSection } from "./InitiationSection";
 import { LocationSection } from "./LocationSection";
 import { DocumentSection } from "./DocumentSection";
 import { SuccessState } from "./SuccessState";
+import { ExistingUserModal } from "./ExistingUserModal";
+import { OfferingFormData } from "./types";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function profileToFormData(
+  user: ExistingUserProfile,
+  language: string,
+): OfferingFormData {
+  return {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    gender: user.gender,
+    email: user.email,
+    phone: user.phone,
+    initiated: user.initiated,
+    initiatedName: user.initiatedName,
+    initiationType: user.initiationType,
+    initiationYear: user.initiationYear,
+    countryId: user.countryId,
+    stateId: user.stateId,
+    cityId: user.cityId,
+    templeId: user.templeId,
+    language,
+  };
+}
+
+function emptyFormExceptEmail(email: string): OfferingFormData {
+  return {
+    firstName: "",
+    lastName: "",
+    gender: "",
+    email,
+    phone: "",
+    initiated: false,
+    initiatedName: "",
+    initiationType: "",
+    initiationYear: "",
+    countryId: "",
+    stateId: "",
+    cityId: "",
+    templeId: "",
+    language: "English",
+  };
+}
 
 export default function UploadOfferingForm() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [error, setError] = useState<string | null>(null);
+  const [existingUserModalOpen, setExistingUserModalOpen] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+  const savedProfileRef = useRef<ExistingUserProfile | null>(null);
+  const dismissedModalEmailRef = useRef<string | null>(null);
 
   const { formData, setFormData, handleInputChange, handleSelectChange } =
     useOfferingForm();
@@ -42,12 +95,64 @@ export default function UploadOfferingForm() {
     isReviewing,
   } = useSubmitOffering(formData, setFormData, file, extractedText, setError);
 
+  const handleEmailChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    handleInputChange(e);
+    if (e.target.name === "email") {
+      dismissedModalEmailRef.current = null;
+    }
+  };
+
+  const handleEmailBlur = async () => {
+    const email = formData.email.trim();
+    if (!email || !EMAIL_RE.test(email)) return;
+    if (dismissedModalEmailRef.current === email.toLowerCase()) return;
+
+    setCheckingEmail(true);
+    setError(null);
+    try {
+      const result = await checkUserByEmail(email);
+      if (!result.exists) {
+        if ("error" in result && result.error) {
+          setError(result.error);
+        }
+        return;
+      }
+      savedProfileRef.current = result.user;
+      setExistingUserModalOpen(true);
+    } finally {
+      setCheckingEmail(false);
+    }
+  };
+
+  const handleUseSavedProfile = () => {
+    const profile = savedProfileRef.current;
+    if (profile) {
+      setFormData((prev) => profileToFormData(profile, prev.language));
+    }
+    dismissedModalEmailRef.current = formData.email.trim().toLowerCase();
+    savedProfileRef.current = null;
+  };
+
+  const handleSkipAndReenter = () => {
+    setFormData((prev) => emptyFormExceptEmail(prev.email.trim()));
+    dismissedModalEmailRef.current = formData.email.trim().toLowerCase();
+    savedProfileRef.current = null;
+  };
+
   if (success) {
     return <SuccessState onReturnHome={() => router.push("/")} />;
   }
 
   return (
     <>
+      <ExistingUserModal
+        open={existingUserModalOpen}
+        onOpenChange={setExistingUserModalOpen}
+        onUseSaved={handleUseSavedProfile}
+        onSkipAndReenter={handleSkipAndReenter}
+      />
       <div className="w-full max-w-4xl mx-auto bg-[#0a2540] rounded-3xl shadow-2xl overflow-hidden font-sans border border-white/10 relative">
         <div className="p-8 md:p-14">
           {/* Stepper UI */}
@@ -108,6 +213,9 @@ export default function UploadOfferingForm() {
                   formData={formData}
                   handleInputChange={handleInputChange}
                   handleSelectChange={handleSelectChange}
+                  onEmailChange={handleEmailChange}
+                  onEmailBlur={handleEmailBlur}
+                  isCheckingEmail={checkingEmail}
                 />
                 <InitiationSection
                   formData={formData}

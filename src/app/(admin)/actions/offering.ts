@@ -8,8 +8,9 @@ import {
   temples,
   users,
   offerings,
+  offeringEditLogs,
 } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 const mammoth = require("mammoth");
 
 export async function getCountries() {
@@ -64,39 +65,143 @@ export async function getTemplesByStateId(stateId: string) {
   }
 }
 
+/** Profile fields returned when an email already exists (for prefill). */
+export type ExistingUserProfile = {
+  firstName: string;
+  lastName: string;
+  gender: "male" | "female" | "other";
+  email: string;
+  phone: string;
+  countryId: string;
+  stateId: string;
+  cityId: string;
+  templeId: string;
+  initiated: boolean;
+  initiationType: string;
+  initiationYear: string;
+  initiatedName: string;
+};
+
+export async function checkUserByEmail(
+  email: string,
+): Promise<
+  | { exists: false; error?: string }
+  | { exists: true; user: ExistingUserProfile }
+> {
+  try {
+    const trimmed = email.trim();
+    if (!trimmed) {
+      return { exists: false };
+    }
+    const [row] = await db
+      .select()
+      .from(users)
+      .where(sql`lower(${users.email}) = ${trimmed.toLowerCase()}`)
+      .limit(1);
+    if (!row) {
+      return { exists: false };
+    }
+    return {
+      exists: true,
+      user: {
+        firstName: row.firstName,
+        lastName: row.lastName,
+        gender: row.gender,
+        email: row.email,
+        phone: row.phone,
+        countryId: row.countryId,
+        stateId: row.stateId,
+        cityId: row.cityId,
+        templeId: row.templeId,
+        initiated: row.initiated,
+        initiationType: row.initiationType,
+        initiationYear: row.initiationYear,
+        initiatedName: row.initiatedName,
+      },
+    };
+  } catch (error) {
+    console.error("checkUserByEmail:", error);
+    return { exists: false, error: "Could not verify email. Try again." };
+  }
+}
+
 export async function submitOffering(formData: any) {
   try {
-    // 1. Insert/Update User
-    const [user] = await db
-      .insert(users)
-      .values({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        gender: formData.gender,
-        email: formData.email,
-        phone: formData.phone,
-        countryId: formData.countryId,
-        stateId: formData.stateId,
-        cityId: formData.cityId,
-        templeId: formData.templeId,
-        initiated: formData.initiated === "true" || formData.initiated === true,
-        initiationType: formData.initiationType || "",
-        initiationYear: formData.initiationYear || "",
-        initiatedName: formData.initiatedName || "",
-      })
-      .returning();
+    const year = new Date().getFullYear().toString();
+    const emailNorm = formData.email.trim().toLowerCase();
 
-    if (!user) {
-      return { success: false, error: "Failed to create user record." };
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(sql`lower(${users.email}) = ${emailNorm}`)
+      .limit(1);
+
+    const userValues = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      gender: formData.gender,
+      email: formData.email.trim(),
+      phone: formData.phone,
+      countryId: formData.countryId,
+      stateId: formData.stateId,
+      cityId: formData.cityId,
+      templeId: formData.templeId,
+      initiated: formData.initiated === "true" || formData.initiated === true,
+      initiationType: formData.initiationType || "",
+      initiationYear: formData.initiationYear || "",
+      initiatedName: formData.initiatedName || "",
+      updatedAt: new Date(),
+    };
+
+    let userId: string;
+
+    if (existingUser) {
+      await db
+        .update(users)
+        .set(userValues)
+        .where(eq(users.id, existingUser.id));
+      userId = existingUser.id;
+    } else {
+      const [created] = await db
+        .insert(users)
+        .values(userValues)
+        .returning();
+      if (!created) {
+        return { success: false, error: "Failed to create user record." };
+      }
+      userId = created.id;
     }
 
-    // 2. Insert Offering
-    await db.insert(offerings).values({
-      userId: user.id,
-      year: new Date().getFullYear().toString(),
-      offering: formData.offeringText,
-      language: formData.language || "English",
-    });
+    const [existingOffering] = await db
+      .select()
+      .from(offerings)
+      .where(and(eq(offerings.userId, userId), eq(offerings.year, year)))
+      .limit(1);
+
+    if (existingOffering) {
+      await db
+        .delete(offeringEditLogs)
+        .where(eq(offeringEditLogs.offeringId, existingOffering.id));
+
+      await db
+        .update(offerings)
+        .set({
+          offering: formData.offeringText,
+          language: formData.language || "English",
+          updatedAt: new Date(),
+          lastEditedAt: null,
+          lastEditedByRole: null,
+          lastEditedByMaintainerId: null,
+        })
+        .where(eq(offerings.id, existingOffering.id));
+    } else {
+      await db.insert(offerings).values({
+        userId,
+        year,
+        offering: formData.offeringText,
+        language: formData.language || "English",
+      });
+    }
 
     return { success: true };
   } catch (error) {
