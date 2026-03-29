@@ -1,5 +1,6 @@
 "use server";
 
+import { assertCanManageOfferings } from "@/lib/auth";
 import { db } from "@/db";
 import {
   countries,
@@ -390,6 +391,8 @@ export async function getAdminOfferings(filters?: {
   templeId?: string;
   language?: string;
 }) {
+  await assertCanManageOfferings();
+
   const conditions = [];
 
   if (filters?.countryId) {
@@ -438,6 +441,8 @@ export async function editOffering(
   id: string,
   data: { offering: string; language: "Hindi" | "English" },
 ) {
+  await assertCanManageOfferings();
+
   try {
     await db
       .update(offerings)
@@ -449,6 +454,7 @@ export async function editOffering(
       .where(eq(offerings.id, id));
 
     revalidatePath("/admin-dashboard/offerings");
+    revalidatePath("/maintainer-dashboard/offerings");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

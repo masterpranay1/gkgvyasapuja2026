@@ -11,6 +11,8 @@ interface OfferingsFilterProps {
   states: LocationItem[];
   cities: LocationItem[];
   temples: LocationItem[];
+  /** Base path for offerings list (e.g. admin vs maintainer dashboard). */
+  basePath?: string;
 }
 
 export function OfferingsFilter({
@@ -18,6 +20,7 @@ export function OfferingsFilter({
   states,
   cities,
   temples,
+  basePath = "/admin-dashboard/offerings",
 }: OfferingsFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,11 +38,11 @@ export function OfferingsFilter({
     } else {
       params.delete(key);
     }
-    router.push(`/admin-dashboard/offerings?${params.toString()}`);
+    router.push(`${basePath}?${params.toString()}`);
   };
 
   const handleClear = () => {
-    router.push("/admin-dashboard/offerings");
+    router.push(basePath);
   };
 
   return (

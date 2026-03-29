@@ -3,32 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  Globe,
-  Map,
-  MapPin,
-  Building2,
-  BookOpen,
-  LayoutDashboard,
-  UserCog,
-} from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 const navItems = [
-  { name: "Dashboard", href: "/admin-dashboard", icon: LayoutDashboard },
-  { name: "Countries", href: "/admin-dashboard/countries", icon: Globe },
-  { name: "States", href: "/admin-dashboard/states", icon: Map },
-  { name: "Cities", href: "/admin-dashboard/cities", icon: MapPin },
-  { name: "Temples", href: "/admin-dashboard/temples", icon: Building2 },
-  { name: "Books", href: "/admin-dashboard/books", icon: BookOpen },
-  { name: "Offerings", href: "/admin-dashboard/offerings", icon: BookOpen },
-  {
-    name: "Manage Maintainers",
-    href: "/admin-dashboard/maintainers",
-    icon: UserCog,
-  },
+  { name: "Offerings", href: "/maintainer-dashboard/offerings", icon: BookOpen },
 ];
 
-export function Sidebar() {
+export function MaintainerSidebar() {
   const pathname = usePathname();
 
   return (

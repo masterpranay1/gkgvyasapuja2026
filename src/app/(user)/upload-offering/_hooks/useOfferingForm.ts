@@ -22,11 +22,12 @@ export function useOfferingForm() {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value, type } = e.target;
-    const checked = e.target.checked;
+    const t = e.target;
+    const { name, value } = t;
+    const isCheckbox = t instanceof HTMLInputElement && t.type === "checkbox";
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: isCheckbox ? t.checked : value,
     }));
   };
 
