@@ -24,33 +24,71 @@ export function InitiationSection({
   handleSelectChange,
 }: Props) {
   return (
-    <section className="bg-white/5 -mx-8 md:-mx-14 px-8 md:px-14 py-10 border-y border-white/10">
-      <div className="flex items-center gap-4 mb-8">
-        <input
-          type="checkbox"
-          name="initiated"
-          id="initiated-checkbox"
-          checked={formData.initiated}
-          onChange={handleInputChange}
-          className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#0a2540] focus:ring-white/20 cursor-pointer transition-colors"
-        />
-        <label
-          htmlFor="initiated-checkbox"
-          className="text-2xl font-semibold text-white cursor-pointer select-none"
-        >
-          Are you initiated? / क्या आप दीक्षित हैं?
-        </label>
+    <section className="py-2">
+      <div className="flex items-center gap-2 mb-4">
+        <span className="text-amber-500">•</span>
+        <h3 className="text-xs font-extrabold tracking-[0.22em] text-slate-500 uppercase">
+          Spiritual Status
+        </h3>
+      </div>
+
+      <div className="space-y-4">
+        <p className="text-sm font-semibold text-slate-800">
+          Are you initiated?
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            type="button"
+            onClick={() =>
+              handleInputChange({
+                target: { name: "initiated", type: "checkbox", checked: true },
+              } as unknown as React.ChangeEvent<HTMLInputElement>)
+            }
+            className={[
+              "h-12 rounded-full border text-sm font-semibold transition-colors",
+              formData.initiated
+                ? "bg-white border-amber-400/70 text-slate-900 shadow-sm"
+                : "bg-[#EEF3FF] border-transparent text-slate-700 hover:bg-[#E6EEFF]",
+            ].join(" ")}
+          >
+            Yes, I am
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              handleInputChange({
+                target: {
+                  name: "initiated",
+                  type: "checkbox",
+                  checked: false,
+                },
+              } as unknown as React.ChangeEvent<HTMLInputElement>)
+            }
+            className={[
+              "h-12 rounded-full border text-sm font-semibold transition-colors",
+              !formData.initiated
+                ? "bg-white border-amber-400/70 text-slate-900 shadow-sm"
+                : "bg-[#EEF3FF] border-transparent text-slate-700 hover:bg-[#E6EEFF]",
+            ].join(" ")}
+          >
+            Not yet
+          </button>
+        </div>
       </div>
 
       {formData.initiated && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 animate-in slide-in-from-top-4 fade-in duration-500">
-          <FormField label="Initiated Name" subLabel="दीक्षित नाम" required>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 animate-in slide-in-from-top-4 fade-in duration-500 mt-6">
+          <FormField
+            label="Initiated Name"
+            subLabel="दीक्षित नाम"
+            required
+          >
             <Input
               name="initiatedName"
               value={formData.initiatedName}
               onChange={handleInputChange}
               placeholder="Das/Dasi"
-              className="h-12 bg-white border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-xl transition-colors shadow-sm"
+              className="h-12 px-6 bg-[#EEF3FF] border-transparent text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/40 rounded-full text-base transition-colors"
             />
           </FormField>
           <FormField
@@ -64,25 +102,25 @@ export function InitiationSection({
                 handleSelectChange("initiationType", val as string)
               }
             >
-              <SelectTrigger className="h-12 py-6 px-4 bg-white border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-xl transition-colors shadow-sm">
+              <SelectTrigger className="h-12 w-full px-6 bg-[#EEF3FF] border-transparent text-slate-800 focus:ring-2 focus:ring-amber-400/40 rounded-full text-base transition-colors">
                 <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
                   value="Harinam"
-                  className="text-lg p-3 hover:bg-gray-50 cursor-pointer"
+                  className="text-sm p-3 hover:bg-gray-50 cursor-pointer"
                 >
                   Harinam
                 </SelectItem>
                 <SelectItem
                   value="Brahman"
-                  className="text-lg p-3 hover:bg-gray-50 cursor-pointer"
+                  className="text-sm p-3 hover:bg-gray-50 cursor-pointer"
                 >
                   Brahman
                 </SelectItem>
                 <SelectItem
                   value="Sannyas"
-                  className="text-lg p-3 hover:bg-gray-50 cursor-pointer"
+                  className="text-sm p-3 hover:bg-gray-50 cursor-pointer"
                 >
                   Sannyas
                 </SelectItem>
@@ -99,7 +137,8 @@ export function InitiationSection({
               value={formData.initiationYear}
               onChange={handleInputChange}
               placeholder="YYYY"
-              className="h-12 bg-white border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-xl transition-colors shadow-sm"
+              type="number"
+              className="h-12 px-6 bg-[#EEF3FF] border-transparent text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/40 rounded-full text-base transition-colors"
             />
           </FormField>
         </div>

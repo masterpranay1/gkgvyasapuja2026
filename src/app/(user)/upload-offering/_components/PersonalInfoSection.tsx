@@ -35,29 +35,44 @@ export function PersonalInfoSection({
 }: Props) {
   return (
     <section>
-      <h3 className="text-2xl font-semibold text-white mb-8 border-b border-white/10 pb-4">
-        Personal Information / व्यक्तिगत जानकारी
-      </h3>
+      <div className="flex items-center gap-2 mb-6">
+        <span className="text-amber-500">•</span>
+        <h3 className="text-xs font-extrabold tracking-[0.22em] text-slate-500 uppercase">
+          Core Details
+        </h3>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-        <FormField label="First Name" subLabel="पहला नाम" required>
+        <FormField
+          label="First Name"
+          subLabel="पहला नाम"
+          required
+        >
           <Input
             name="firstName"
             value={formData.firstName}
             onChange={handleInputChange}
             placeholder="John"
-            className="h-12 px-5 bg-gray-50 border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-2xl transition-colors"
+            className="h-12 px-6 bg-[#EEF3FF] border-transparent text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/40 rounded-full text-base transition-colors"
           />
         </FormField>
-        <FormField label="Last Name" subLabel="अंतिम नाम" required>
+        <FormField
+          label="Last Name"
+          subLabel="अंतिम नाम"
+          required
+        >
           <Input
             name="lastName"
             value={formData.lastName}
             onChange={handleInputChange}
             placeholder="Doe"
-            className="h-12 px-5 bg-gray-50 border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-xl transition-colors"
+            className="h-12 px-6 bg-[#EEF3FF] border-transparent text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/40 rounded-full text-base transition-colors"
           />
         </FormField>
-        <FormField label="Email" subLabel="ईमेल" required>
+        <FormField
+          label="Email"
+          subLabel="ईमेल"
+          required
+        >
           <div className="relative">
             <Input
               name="email"
@@ -67,23 +82,28 @@ export function PersonalInfoSection({
               onBlur={onEmailBlur}
               placeholder="john@example.com"
               disabled={isCheckingEmail}
-              className="h-12 px-5 bg-gray-50 border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-xl transition-colors pr-12"
+              className="h-12 px-6 bg-[#EEF3FF] border-transparent text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/40 rounded-full text-base transition-colors pr-12 disabled:opacity-70"
             />
             {isCheckingEmail && (
               <Loader2
-                className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-[#0a2540]/60"
+                className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-slate-500"
                 aria-hidden
               />
             )}
           </div>
         </FormField>
-        <FormField label="Phone" subLabel="फ़ोन नंबर" required>
+        <FormField
+          label="Phone"
+          subLabel="फ़ोन नंबर"
+          required
+        >
           <Input
             name="phone"
             value={formData.phone}
+            type="number"
             onChange={handleInputChange}
             placeholder="+1 234 567 890"
-            className="h-12 px-5 bg-gray-50 border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-xl transition-colors"
+            className="h-12 py-6 px-6 bg-[#EEF3FF] border-transparent text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/40 rounded-full text-base transition-colors"
           />
         </FormField>
         <FormField
@@ -96,13 +116,28 @@ export function PersonalInfoSection({
             value={formData.gender}
             onValueChange={(val) => handleSelectChange("gender", val as string)}
           >
-            <SelectTrigger className="h-12 py-6 px-4 bg-gray-50 border-gray-200 text-gray-900 focus:ring-[#0a2540]/20 rounded-xl text-lg transition-colors">
+            <SelectTrigger className="h-12 w-full px-6 bg-[#EEF3FF] border-transparent text-slate-800 focus:ring-2 focus:ring-amber-400/40 rounded-full text-base transition-colors">
               <SelectValue placeholder="Select Gender" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              <SelectItem
+                className="text-sm p-3 hover:bg-gray-50 cursor-pointer"
+                value="male"
+              >
+                Male
+              </SelectItem>
+              <SelectItem
+                className="text-sm p-3 hover:bg-gray-50 cursor-pointer"
+                value="female"
+              >
+                Female
+              </SelectItem>
+              <SelectItem
+                className="text-sm p-3 hover:bg-gray-50 cursor-pointer"
+                value="other"
+              >
+                Other
+              </SelectItem>
             </SelectContent>
           </Select>
         </FormField>
