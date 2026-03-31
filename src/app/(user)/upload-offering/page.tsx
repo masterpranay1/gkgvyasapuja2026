@@ -11,18 +11,18 @@ export default function UploadOfferingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-gray-700 flex flex-col font-sans">
+    <main className="min-h-screen mx-auto px-4 bg-gradient-to-b from-white to-slate-50 text-gray-700 flex flex-col font-sans">
       {" "}
-      <section className="flex-1 w-full relative py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="flex-1 w-full relative py-12 md:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Background glow effects */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-125 bg-blue-500/20 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center">
+        <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center">
           <div className="text-center mb-12 sm:mb-16">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-black mb-6 tracking-tight">
               Offer Your Homage
             </h1>
-            <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-gray-600 max-w-xl mx-auto leading-relaxed">
               Please share your Vyas Puja offering for His Holiness Gopal
               Krishna Goswami Maharaja. We accept offerings in English and
               Hindi.
@@ -51,7 +51,9 @@ export default function UploadOfferingPage() {
             file for reference.
           </p>
 
-          <UploadOfferingForm />
+         <div className="w-full bg-white border border-gray-200 shadow-xl rounded-2xl p-6 md:p-10">
+            <UploadOfferingForm />
+          </div>
 
           <div className="text-center">
             <h2 className="text-2xl md:text-3xl font-semibold text-black mb-4 tracking-tight mt-20">
@@ -84,7 +86,7 @@ export default function UploadOfferingPage() {
             </p>
           </div>
 
-          <div className="w-full max-w-5xl mx-auto mt-16 bg-white border border-slate-200 shadow-lg rounded-3xl p-8">
+          <div className="w-full max-w-4xl mx-auto mt-14 bg-white border border-slate-200 shadow-lg rounded-3xl p-8">
             <div className="text-center mb-6">
               <h2
                 id="how-to"

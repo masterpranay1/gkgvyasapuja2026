@@ -46,7 +46,7 @@ export function LocationSection({
               handleSelectChange("countryId", val as string)
             }
           >
-            <SelectTrigger className="h-12 w-full px-6 bg-[#EEF3FF] border-transparent text-slate-800 focus:ring-2 focus:ring-amber-400/40 rounded-full text-base transition-colors">
+            <SelectTrigger className="h-11 w-full px-5 bg-slate-50 border border-slate-200 text-slate-700 focus:ring-2 focus:ring-amber-400/20 rounded-xl text-[15px] transition-all">
               <SelectValue placeholder="Select Country">
                 {countries.find((c) => c.id === formData.countryId)?.name ||
                   "Select Country"}
@@ -78,7 +78,7 @@ export function LocationSection({
             }
             disabled={!formData.countryId}
           >
-            <SelectTrigger className="h-12 w-full px-6 bg-[#EEF3FF] border-transparent text-slate-800 focus:ring-2 focus:ring-amber-400/40 rounded-full text-base transition-colors disabled:opacity-60 disabled:bg-[#EEF3FF]">
+            <SelectTrigger className="h-11 w-full px-5 bg-slate-50 border border-slate-200 text-slate-700 focus:ring-2 focus:ring-amber-400/20 rounded-xl text-[15px] transition-all">
               <SelectValue placeholder="Select State">
                 {states.find((s) => s.id === formData.stateId)?.name ||
                   "Select State"}
@@ -108,7 +108,7 @@ export function LocationSection({
             onValueChange={(val) => handleSelectChange("cityId", val as string)}
             disabled={!formData.stateId}
           >
-            <SelectTrigger className="h-12 w-full px-6 bg-[#EEF3FF] border-transparent text-slate-800 focus:ring-2 focus:ring-amber-400/40 rounded-full text-base transition-colors disabled:opacity-60 disabled:bg-[#EEF3FF]">
+            <SelectTrigger className="h-11 w-full px-5 bg-slate-50 border border-slate-200 text-slate-700 focus:ring-2 focus:ring-amber-400/20 rounded-xl text-[15px] transition-all">
               <SelectValue placeholder="Select City">
                 {cities.find((c) => c.id === formData.cityId)?.name ||
                   "Select City"}
@@ -140,7 +140,7 @@ export function LocationSection({
             }
             disabled={!formData.stateId}
           >
-            <SelectTrigger className="h-12 w-full px-6 bg-[#EEF3FF] border-transparent text-slate-800 focus:ring-2 focus:ring-amber-400/40 rounded-full text-base transition-colors disabled:opacity-60 disabled:bg-[#EEF3FF]">
+            <SelectTrigger className="h-11 w-full px-5 bg-slate-50 border border-slate-200 text-slate-700 focus:ring-2 focus:ring-amber-400/20 rounded-xl text-[15px] transition-all">
               <SelectValue placeholder="Select Temple">
                 {temples.find((t) => t.id === formData.templeId)?.name ||
                   "Select Temple"}
