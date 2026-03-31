@@ -51,7 +51,7 @@ export default function UploadOfferingPage() {
             file for reference.
           </p>
 
-          <div className="w-full bg-white border border-gray-200 shadow-md rounded-2xl p-6 md:p-10">
+          <div className="w-full max-w-5xl mx-auto bg-white border border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.04)] rounded-2xl p-5 md:p-8">
             <UploadOfferingForm />
           </div>
 

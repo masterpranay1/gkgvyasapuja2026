@@ -31,7 +31,7 @@ export function InitiationSection({
       <div className="flex items-center gap-2 mb-4">
         <span className="text-amber-400">•</span>
         <h3 className="text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase">
-          Spiritual Status
+          Spiritual Details
         </h3>
       </div>
 
@@ -75,7 +75,7 @@ export function InitiationSection({
                 : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
             }`}
           >
-            Not
+            No
           </button>
         </div>
       </div>

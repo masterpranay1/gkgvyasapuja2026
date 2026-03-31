@@ -121,8 +121,7 @@ export function DocumentSection({
           Step 2 of 3: Upload your offering
         </h2>
         <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-          Your offering is a heartfelt expression of gratitude. It serves as a
-          bridge between your service and the divine grace of Srila Prabhupada.
+          Your offering is a heartfelt expression of gratitude.
         </p>
       </div>
 

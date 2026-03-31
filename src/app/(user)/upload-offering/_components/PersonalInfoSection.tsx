@@ -40,7 +40,7 @@ export function PersonalInfoSection({
       <div className="flex items-center gap-2 mb-5">
         <span className="text-amber-400">•</span>
         <h3 className="text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase">
-          Core Details
+          Legal Name & Contact Information
         </h3>
       </div>
 
