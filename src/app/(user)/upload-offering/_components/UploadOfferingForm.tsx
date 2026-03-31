@@ -201,7 +201,7 @@ export default function UploadOfferingForm() {
           </div>
         </div>
 
-        <div className="w-full max-w-6xl mx-auto bg-white rounded-3xl shadow-lg overflow-hidden font-sans border border-slate-100">
+        <div className="w-full max-w-6xl mx-auto  overflow-hidden font-sans ">
           <div className="p-8 md:p-10">
             {error && (
               <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-700 text-sm font-medium flex items-start gap-3">

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -35,9 +36,10 @@ export function InitiationSection({
       </div>
 
       <div className="space-y-4">
-        <p className="text-sm font-medium text-slate-600">
+        <p className="text-sm font-bold mb-0 text-slate-800">
           Are you initiated?
         </p>
+        <p className="text-xs text-slate-500">क्या आप दीक्षित हैं?</p>
 
         <div className="grid grid-cols-2 gap-3">
           <button
@@ -53,7 +55,7 @@ export function InitiationSection({
                 : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
             }`}
           >
-            Initiated
+            Yes
           </button>
 
           <button
@@ -73,14 +75,18 @@ export function InitiationSection({
                 : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
             }`}
           >
-            Not Initiated
+            Not
           </button>
         </div>
       </div>
 
       {formData.initiated && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 animate-in slide-in-from-top-4 fade-in duration-500">
-          <FormField label="Initiated Name" subLabel="दीक्षित नाम" required>
+          <FormField
+            label="Initiated Name"
+            subLabel="दीक्षित नाम"
+            required
+          >
             <Input
               name="initiatedName"
               value={formData.initiatedName}
@@ -90,7 +96,11 @@ export function InitiationSection({
             />
           </FormField>
 
-          <FormField label="Initiation Type" subLabel="दीक्षा का प्रकार" required>
+          <FormField
+            label="Initiation Type"
+            subLabel="दीक्षा का प्रकार"
+            required
+          >
             <Select
               value={formData.initiationType}
               onValueChange={(val) =>
@@ -115,7 +125,11 @@ export function InitiationSection({
             </Select>
           </FormField>
 
-          <FormField label="Year of Initiation" subLabel="दीक्षा का वर्ष" required>
+          <FormField
+            label="Year of Initiation"
+            subLabel="दीक्षा का वर्ष"
+            required
+          >
             <Input
               name="initiationYear"
               value={formData.initiationYear}

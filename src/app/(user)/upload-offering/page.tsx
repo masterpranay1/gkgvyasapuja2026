@@ -29,7 +29,7 @@ export default function UploadOfferingPage() {
             </p>
           </div>
 
-          <p className="text-center bg-white p-5 shadow-lg mb-10 rounded-lg text-gray-700">
+          <p className="text-center bg-white p-5 shadow-md mb-10 rounded-lg text-gray-700">
             For better insights on how to write the perfect offering please go
             through{" "}
             <a
@@ -51,7 +51,7 @@ export default function UploadOfferingPage() {
             file for reference.
           </p>
 
-         <div className="w-full bg-white border border-gray-200 shadow-xl rounded-2xl p-6 md:p-10">
+          <div className="w-full bg-white border border-gray-200 shadow-md rounded-2xl p-6 md:p-10">
             <UploadOfferingForm />
           </div>
 
