@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Download, Eye } from "lucide-react";
 
 interface EbookItem {
@@ -113,24 +114,26 @@ const Ebooks = () => {
                   {group.data.map((book) => (
                     <article
                       key={book.id}
-                      className="rounded-xl border border-slate-200 p-5 bg-gradient-to-br from-white via-slate-50 to-white shadow-sm"
+                      className="rounded-xl border border-slate-200 p-5 bg-linear-to-br from-white via-slate-50 to-white shadow-sm"
                     >
                       <div className="flex items-start gap-3">
-                        <img
+                        <Image
                           src={
                             book.thumbnail ||
                             "/asset/heroAndGallery/default-book.png"
                           }
                           alt={book.title}
                           className="h-20 w-20 rounded-md object-cover border border-slate-200"
+                          width={80}
+                          height={80}
                         />
                         <div>
                           <h3 className="text-lg font-semibold text-slate-900">
                             {book.title || "Untitled ebook"}
                           </h3>
-                          <p className="text-sm text-slate-500 mt-1">
+                          {/* <p className="text-sm text-slate-500 mt-1">
                             Year: {book.publishedYear || group.YearId}
-                          </p>
+                          </p> */}
                         </div>
                       </div>
                       <div className="mt-4 flex gap-2">
