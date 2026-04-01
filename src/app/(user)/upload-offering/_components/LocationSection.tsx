@@ -26,6 +26,7 @@ export function LocationSection({
   cities,
   temples,
 }: Props) {
+  console.log({ formData });
   return (
     <section>
       <div className="flex items-center gap-2 mb-6">
@@ -143,6 +144,7 @@ export function LocationSection({
             <SelectTrigger className="h-11 w-full px-5 bg-slate-50 border border-slate-200 text-slate-700 focus:ring-2 focus:ring-amber-400/20 rounded-xl text-[15px] transition-all">
               <SelectValue placeholder="Select Temple">
                 {temples.find((t) => t.id === formData.templeId)?.name ||
+                  (formData.templeId === "0" && "Other") ||
                   "Select Temple"}
               </SelectValue>
             </SelectTrigger>
@@ -156,6 +158,12 @@ export function LocationSection({
                   {t.name}
                 </SelectItem>
               ))}
+              <SelectItem
+                className="text-sm py-3 hover:bg-gray-50 cursor-pointer"
+                value="0"
+              >
+                Other
+              </SelectItem>
             </SelectContent>
           </Select>
         </FormField>
