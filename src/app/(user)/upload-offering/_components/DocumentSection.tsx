@@ -228,11 +228,13 @@ export function DocumentSection({
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
                 <div>
-                  <div className="upload-offering-quill w-full rounded-2xl border border-slate-200 bg-white shadow-sm focus-within:border-[#0f2744]/30 focus-within:ring-2 focus-within:ring-[#0f2744]/15 overflow-hidden">
-                    <QuillEditor
-                      value={extractedText}
-                      onChange={setExtractedText}
-                    />
+                  <div className="upload-offering-quill w-full h-[60vh] rounded-2xl border border-slate-200 bg-white shadow-sm focus-within:border-[#0f2744]/30 focus-within:ring-2 focus-within:ring-[#0f2744]/15 overflow-hidden flex flex-col">
+                    <div className="flex-1 overflow-y-auto">
+                      <QuillEditor
+                        value={extractedText}
+                        onChange={setExtractedText}
+                      />
+                    </div>
                   </div>
 
                   {changes.length > 0 && (

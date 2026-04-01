@@ -46,27 +46,8 @@ export function PersonalInfoSection({
 
       {/* Form Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-        <FormField label="First Name" subLabel="पहला नाम" required>
-          <Input
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleInputChange}
-            placeholder="Your first name"
-            className="h-11 px-5 bg-slate-50 border border-slate-200 text-slate-700 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/20 rounded-xl text-[15px] transition-all"
-          />
-        </FormField>
 
-        <FormField label="Last Name" subLabel="अंतिम नाम" required>
-          <Input
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleInputChange}
-            placeholder="Your last name"
-            className="h-11 px-5 bg-slate-50 border border-slate-200 text-slate-700 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/20 rounded-xl text-[15px] transition-all"
-          />
-        </FormField>
-
-        <FormField label="Email" subLabel="ईमेल" required>
+         <FormField label="Email" subLabel="ईमेल" required>
           <div className="relative">
             <Input
               name="email"
@@ -97,6 +78,28 @@ export function PersonalInfoSection({
             className="h-11 px-5 bg-slate-50 border border-slate-200 text-slate-700 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/20 rounded-xl text-[15px] transition-all"
           />
         </FormField>
+
+        <FormField label="First Name" subLabel="पहला नाम" required>
+          <Input
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleInputChange}
+            placeholder="Your first name"
+            className="h-11 px-5 bg-slate-50 border border-slate-200 text-slate-700 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/20 rounded-xl text-[15px] transition-all"
+          />
+        </FormField>
+
+        <FormField label="Last Name" subLabel="अंतिम नाम" required>
+          <Input
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleInputChange}
+            placeholder="Your last name"
+            className="h-11 px-5 bg-slate-50 border border-slate-200 text-slate-700 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-amber-400/20 rounded-xl text-[15px] transition-all"
+          />
+        </FormField>
+
+       
 
         <FormField
           label="Gender"
