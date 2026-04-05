@@ -121,8 +121,7 @@ export function DocumentSection({
           Step 2 of 3: Upload your offering
         </h2>
         <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-          Your offering is a heartfelt expression of gratitude. It serves as a
-          bridge between your service and the divine grace of Srila Prabhupada.
+          Your offering is a heartfelt expression of gratitude.
         </p>
       </div>
 
@@ -229,11 +228,13 @@ export function DocumentSection({
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
                 <div>
-                  <div className="upload-offering-quill w-full rounded-2xl border border-slate-200 bg-white shadow-sm focus-within:border-[#0f2744]/30 focus-within:ring-2 focus-within:ring-[#0f2744]/15 overflow-hidden">
-                    <QuillEditor
-                      value={extractedText}
-                      onChange={setExtractedText}
-                    />
+                  <div className="upload-offering-quill w-full h-[60vh] rounded-2xl border border-slate-200 bg-white shadow-sm focus-within:border-[#0f2744]/30 focus-within:ring-2 focus-within:ring-[#0f2744]/15 overflow-hidden flex flex-col">
+                    <div className="flex-1 overflow-y-auto">
+                      <QuillEditor
+                        value={extractedText}
+                        onChange={setExtractedText}
+                      />
+                    </div>
                   </div>
 
                   {changes.length > 0 && (

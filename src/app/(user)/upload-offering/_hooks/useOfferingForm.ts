@@ -8,7 +8,7 @@ export function useOfferingForm() {
     gender: "",
     email: "",
     phone: "",
-    initiated: false,
+    initiated: true,
     initiatedName: "",
     initiationType: "",
     initiationYear: "",
