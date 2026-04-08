@@ -17,6 +17,7 @@
     "studio": "npx drizzle-kit studio"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1024.0",
     "@base-ui/react": "^1.2.0",
     "@google/genai": "^1.44.0",
     "class-variance-authority": "^0.7.1",

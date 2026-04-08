@@ -67,6 +67,7 @@ export function useSubmitOffering(
 
   const submitFinal = async () => {
     if (!validateForm()) return;
+    if (!file) return;
 
     setIsSubmitting(true);
     setError(null);
@@ -84,10 +85,25 @@ export function useSubmitOffering(
       finalHtml = doc.body.innerHTML;
     }
 
-    const result = await submitOffering({
-      ...formData,
-      offeringText: finalHtml,
-    });
+    const fd = new FormData();
+    fd.append("firstName", formData.firstName);
+    fd.append("lastName", formData.lastName);
+    fd.append("gender", formData.gender);
+    fd.append("email", formData.email);
+    fd.append("phone", formData.phone);
+    fd.append("countryId", formData.countryId);
+    fd.append("stateId", formData.stateId);
+    fd.append("cityId", formData.cityId);
+    fd.append("templeId", formData.templeId);
+    fd.append("initiated", String(formData.initiated));
+    fd.append("initiationType", formData.initiationType);
+    fd.append("initiationYear", formData.initiationYear);
+    fd.append("initiatedName", formData.initiatedName);
+    fd.append("language", formData.language);
+    fd.append("offeringText", finalHtml);
+    fd.append("file", file);
+
+    const result = await submitOffering(fd);
     setIsSubmitting(false);
 
     if (result.success) {

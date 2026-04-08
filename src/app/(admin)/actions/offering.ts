@@ -11,7 +11,17 @@ import {
   offeringEditLogs,
 } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
+import {
+  deleteObjectByKey,
+  deleteObjectByUrl,
+  uploadOfferingDocx,
+} from "@/lib/s3";
 const mammoth = require("mammoth");
+
+function formDataString(fd: FormData, key: string): string {
+  const v = fd.get(key);
+  return typeof v === "string" ? v : "";
+}
 
 export async function getCountries() {
   try {
@@ -125,89 +135,149 @@ export async function checkUserByEmail(
   }
 }
 
-export async function submitOffering(formData: any) {
+export async function submitOffering(fd: FormData) {
+  const year = new Date().getFullYear().toString();
+  const email = formDataString(fd, "email").trim();
+  const emailNorm = email.toLowerCase();
+  const offeringText = formDataString(fd, "offeringText");
+  const lang = formDataString(fd, "language") || "English";
+
+  const initiatedRaw = formDataString(fd, "initiated");
+  const initiated = initiatedRaw === "true" || initiatedRaw === "on";
+
+  const userValues = {
+    firstName: formDataString(fd, "firstName"),
+    lastName: formDataString(fd, "lastName"),
+    gender: formDataString(fd, "gender") as "male" | "female" | "other",
+    email,
+    phone: formDataString(fd, "phone"),
+    countryId: formDataString(fd, "countryId"),
+    stateId: formDataString(fd, "stateId"),
+    cityId: formDataString(fd, "cityId"),
+    templeId: formDataString(fd, "templeId"),
+    initiated,
+    initiationType: formDataString(fd, "initiationType") || "",
+    initiationYear: formDataString(fd, "initiationYear") || "",
+    initiatedName: formDataString(fd, "initiatedName") || "",
+    updatedAt: new Date(),
+  };
+
+  const file = fd.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false, error: "Please upload a .docx offering document." };
+  }
+  if (!file.name.toLowerCase().endsWith(".docx")) {
+    return { success: false, error: "Only .docx files are accepted." };
+  }
+
+  let buffer: Buffer;
   try {
-    const year = new Date().getFullYear().toString();
-    const emailNorm = formData.email.trim().toLowerCase();
+    buffer = Buffer.from(await file.arrayBuffer());
+  } catch {
+    return { success: false, error: "Could not read the uploaded file." };
+  }
 
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(sql`lower(${users.email}) = ${emailNorm}`)
-      .limit(1);
-
-    const userValues = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      gender: formData.gender,
-      email: formData.email.trim(),
-      phone: formData.phone,
-      countryId: formData.countryId,
-      stateId: formData.stateId,
-      cityId: formData.cityId,
-      templeId: formData.templeId,
-      initiated: formData.initiated === "true" || formData.initiated === true,
-      initiationType: formData.initiationType || "",
-      initiationYear: formData.initiationYear || "",
-      initiatedName: formData.initiatedName || "",
-      updatedAt: new Date(),
+  let uploadKey: string;
+  let documentUrl: string;
+  try {
+    const uploaded = await uploadOfferingDocx({
+      year,
+      buffer,
+      originalFileName: file.name,
+    });
+    uploadKey = uploaded.key;
+    documentUrl = uploaded.url;
+  } catch (err) {
+    console.error("S3 upload failed:", err);
+    return {
+      success: false,
+      error:
+        "Could not upload the document. Check AWS credentials and S3 bucket configuration.",
     };
+  }
 
-    let userId: string;
+  let previousDocUrl: string | null = null;
 
-    if (existingUser) {
-      await db
-        .update(users)
-        .set(userValues)
-        .where(eq(users.id, existingUser.id));
-      userId = existingUser.id;
-    } else {
-      const [created] = await db
-        .insert(users)
-        .values(userValues)
-        .returning();
-      if (!created) {
-        return { success: false, error: "Failed to create user record." };
+  try {
+    await db.transaction(async (tx) => {
+      const [existingUser] = await tx
+        .select()
+        .from(users)
+        .where(sql`lower(${users.email}) = ${emailNorm}`)
+        .limit(1);
+
+      let userId: string;
+      if (existingUser) {
+        await tx
+          .update(users)
+          .set(userValues)
+          .where(eq(users.id, existingUser.id));
+        userId = existingUser.id;
+      } else {
+        const [created] = await tx
+          .insert(users)
+          .values(userValues)
+          .returning({ id: users.id });
+        if (!created) {
+          throw new Error("Failed to create user record.");
+        }
+        userId = created.id;
       }
-      userId = created.id;
-    }
 
-    const [existingOffering] = await db
-      .select()
-      .from(offerings)
-      .where(and(eq(offerings.userId, userId), eq(offerings.year, year)))
-      .limit(1);
+      const [existingOffering] = await tx
+        .select()
+        .from(offerings)
+        .where(and(eq(offerings.userId, userId), eq(offerings.year, year)))
+        .limit(1);
 
-    if (existingOffering) {
-      await db
-        .delete(offeringEditLogs)
-        .where(eq(offeringEditLogs.offeringId, existingOffering.id));
+      previousDocUrl = existingOffering?.documentUrl ?? null;
 
-      await db
-        .update(offerings)
-        .set({
-          offering: formData.offeringText,
-          language: formData.language || "English",
-          updatedAt: new Date(),
-          lastEditedAt: null,
-          lastEditedByRole: null,
-          lastEditedByMaintainerId: null,
-        })
-        .where(eq(offerings.id, existingOffering.id));
-    } else {
-      await db.insert(offerings).values({
-        userId,
-        year,
-        offering: formData.offeringText,
-        language: formData.language || "English",
-      });
-    }
+      if (existingOffering) {
+        await tx
+          .delete(offeringEditLogs)
+          .where(eq(offeringEditLogs.offeringId, existingOffering.id));
 
-    return { success: true };
+        await tx
+          .update(offerings)
+          .set({
+            offering: offeringText,
+            language: lang as "Hindi" | "English",
+            documentUrl,
+            updatedAt: new Date(),
+            lastEditedAt: null,
+            lastEditedByRole: null,
+            lastEditedByMaintainerId: null,
+          })
+          .where(eq(offerings.id, existingOffering.id));
+      } else {
+        await tx.insert(offerings).values({
+          userId,
+          year,
+          offering: offeringText,
+          language: lang as "Hindi" | "English",
+          documentUrl,
+        });
+      }
+    });
   } catch (error) {
-    console.error("Failed to submit offering:", error);
+    console.error("Failed to submit offering (transaction):", error);
+    try {
+      await deleteObjectByKey(uploadKey);
+    } catch (delErr) {
+      console.error("Failed to remove orphaned upload from S3:", delErr);
+    }
     return { success: false, error: "An unexpected error occurred." };
   }
+
+  if (previousDocUrl && previousDocUrl !== documentUrl) {
+    try {
+      await deleteObjectByUrl(previousDocUrl);
+    } catch (err) {
+      console.error("Failed to delete previous offering document from S3:", err);
+    }
+  }
+
+  return { success: true };
 }
 
 export async function parseDocx(formData: FormData) {

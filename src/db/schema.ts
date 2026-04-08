@@ -103,6 +103,9 @@ export const offerings = pgTable("offering", {
 
   offering: varchar("offering", { length: 10000 }).notNull(),
 
+  /** Public URL of the uploaded .docx in S3. */
+  documentUrl: varchar("document_url", { length: 2048 }),
+
   language: varchar("language", { length: 255 })
     .$type<"Hindi" | "English">()
     .notNull(),
